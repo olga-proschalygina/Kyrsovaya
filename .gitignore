@@ -1,0 +1,56 @@
+# Visual Studio
+.vs/
+*.ipch
+*.sln.docstates
+Browse.VC.db
+Debug/
+Release/
+x64/
+x86/
+*.user
+*.suo
+
+# Сборка
+bin/
+obj/
+*.exe
+*.pdb
+*.ilk
+*.obj
+*.log
+
+# Прочее
+.DS_Store
+Thumbs.db
+# --- Ðåçóëüòàòû êîìïèëÿöèè ---
+*.o
+*.obj
+*.exe
+*.out
+*.app
+# --- Áèáëèîòåêè ---
+*.a
+*.lib
+*.so
+*.so.*
+*.dll
+*.dylib
+# --- Îòëàäî÷íàÿ èíôîðìàöèÿ ---
+*.pdb
+*.idb
+*.ilk
+# --- Ïàïêè ñáîðêè ---
+build/
+Debug/
+Release/
+x64/
+out/
+# --- Ñëóæåáíûå ôàéëû IDE ---
+.vs/
+.vscode/
+.idea/
+*.user
+# --- CMake ---
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
