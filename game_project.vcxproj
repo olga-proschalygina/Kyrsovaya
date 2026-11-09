@@ -140,12 +140,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="boss.cpp" />
+    <ClCompile Include="entity.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="boss.hpp" />
+    <ClInclude Include="entity.hpp" />
     <ClInclude Include="player.hpp" />
     <ClInclude Include="weapon.hpp" />
   </ItemGroup>

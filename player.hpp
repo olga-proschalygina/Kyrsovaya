@@ -1,47 +1,34 @@
 ﻿#pragma once
 
-#include <memory>
+#include "entity.hpp"
 #include "weapon.hpp"
-#include <cstdint>
-#include <string>
 
 namespace game
 {
 
-    class Player
+    // final запрещает дальнейшее наследование от Player
+    class Player final : public BaseEntity
     {
     private:
-        std::string m_name{ "Hero" };
-        std::int32_t m_health{ 100 };
-        std::int32_t m_maxHealth{ 100 };
-        std::int32_t m_potions{ 2 };
-
-        Weapon m_weapon;  // КОМПОЗИЦИЯ
+        Weapon m_weapon;
+        int m_potions;
 
     public:
-        Player();
-        Player(const std::string& name, std::int32_t health, std::int32_t potions,
-            Weapon::Type weaponType, const std::string& weaponName, std::int32_t weaponDamage);
+        Player(const std::string& name, int health, int potions, Weapon::Type weaponType, const std::string& weaponName, int weaponDamage);
 
-        Player(const Player&) = default;
-        Player& operator=(const Player&) = default;
-        Player(Player&&) = default;
-        Player& operator=(Player&&) = default;
+        // Правило нуля (поля сами управляют памятью, но нам нужен клонирующий конструктор для глубокой копии)
+        Player(const Player& other);
 
-        ~Player();
+        // Переопределяем чисто виртуальные методы
+        void TakeDamage(int damage) override;
+        std::unique_ptr<BaseEntity> Clone() const override;
 
-        [[nodiscard]] const std::string& GetName() const { return m_name; }
-        [[nodiscard]] std::int32_t GetHealth() const { return m_health; }
-        [[nodiscard]] std::int32_t GetMaxHealth() const { return m_maxHealth; }
-        [[nodiscard]] std::int32_t GetPotions() const { return m_potions; }
-        [[nodiscard]] bool IsAlive() const { return m_health > 0; }
+        // Переопределяем с вызовом базового метода
+        std::string Describe() const override;
 
-        [[nodiscard]] const Weapon& GetWeapon() const { return m_weapon; }
-        [[nodiscard]] Weapon& GetWeapon() { return m_weapon; }
-
-        void TakeDamage(std::int32_t damage);
         bool UsePotion();
-        std::int32_t Attack();
+        int Attack();
+        const Weapon& GetWeapon() const { return m_weapon; }
     };
 
 } // namespace game

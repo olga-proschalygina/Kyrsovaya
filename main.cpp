@@ -1,123 +1,50 @@
-//
-// ФАЙЛ main.cpp
-// Лабораторная работа 3. Часть 2. Умные указатели.
-//
-#include "boss.hpp"
+п»ї#include "boss.hpp"
 #include "player.hpp"
 #include "weapon.hpp"
-#include <locale>
+#include <vector>
 #include <iostream>
-#include <memory>  // Для unique_ptr, shared_ptr, weak_ptr
-#include <vector>  // Для std::vector
-#include <windows.h> // Для русского языка в консоли
+#include <windows.h>
+#include <locale.h>
 
 using namespace game;
 
-static void PrintState(const Player& player, const Boss& boss)
-{
-    std::cout << "--- Состояние ---\n";
-    std::cout << "Игрок: " << player.GetName()
-        << ", ОЗ: " << player.GetHealth() << "/" << player.GetMaxHealth()
-        << ", зелий: " << player.GetPotions()
-        << ", оружие: " << player.GetWeapon().GetName() << "\n";
-    std::cout << "Босс: " << boss.GetName()
-        << ", ОЗ: " << boss.GetHealth() << "\n";
-    std::cout << "-----------------\n";
-}
-
 int main()
 {
-    setlocale(LC_ALL, "Russian");
-    SetConsoleOutputCP(65001); // UTF-8 для Windows
+    SetConsoleOutputCP(65001); 
     SetConsoleCP(65001);
+    
 
-    std::cout << "=== ЛР 3: Умные указатели в C++ ===\n\n";
+    std::cout << "=== Р›Р  4: РќР°СЃР»РµРґРѕРІР°РЅРёРµ РІ C++ ===\n\n";
 
-    // ==========================================
-    // 1. Демонстрация std::unique_ptr
-    // ==========================================
-    {
-        std::cout << "\n[1. unique_ptr: эксклюзивное владение и передача через std::move]\n";
+    // 1. РЎРѕР·РґР°РµРј РёРіСЂРѕРєР° Рё Р±РѕСЃСЃР°
+    auto hero = std::make_shared<Player>("Hero", 100, 2, Weapon::Type::eSword, "Excalibur", 25);
+    auto boss = std::make_shared<Boss>("Dragon", 200, 45, hero);
 
-        // Создание через make_unique (нет new)
-        std::unique_ptr<Player> player = std::make_unique<Player>(
-            "UniqueHero", 100, 1, Weapon::Type::eSword, "IronSword", 15
-        );
+    std::cout << "\n--- РњР°СЃСЃРёРІ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° Р±Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ (РїРѕР»РёРјРѕСЂС„РёР·Рј) ---\n";
+    std::vector < std::unique_ptr < BaseEntity>> entities;
 
-        std::cout << "Игрок создан. ОЗ: " << player->GetHealth() << "\n";
+    // РџРµСЂРµРЅРѕСЃРёРј РІР»Р°РґРµРЅРёРµ РІ РІРµРєС‚РѕСЂ (РёСЃРїРѕР»СЊР·СѓРµРј Clone РґР»СЏ РєРѕРїРёРё)
+    entities.push_back(hero->Clone());
+    entities.push_back(boss->Clone());
 
-        // Передача владения
-        std::unique_ptr<Player> newOwner = std::move(player);
-
-        if (!player) {
-            std::cout << "Старый указатель player пуст (владение передано).\n";
-        }
-        if (newOwner) {
-            std::cout << "Новый владелец newOwner управляет игроком: " << newOwner->GetName() << "\n";
-        }
-    } // Здесь newOwner выходит из области видимости, Player уничтожается автоматически
-    std::cout << "Вышли из блока. Игрок уничтожен.\n";
-
-    // ==========================================
-    // 2. Демонстрация std::shared_ptr и std::weak_ptr
-    // ==========================================
-    {
-        std::cout << "\n[2. shared_ptr и weak_ptr: совместное владение и наблюдение]\n";
-
-        // Создаем игрока через shared_ptr
-        std::shared_ptr<Player> hero = std::make_shared<Player>(
-            "SharedHero", 100, 2, Weapon::Type::eSword, "Excalibur", 25
-        );
-
-        std::cout << "Счетчик владельцев hero: " << hero.use_count() << "\n"; // 1
-
-        // Создаем босса и передаем ему weak_ptr (агрегация)
-        // Boss не увеличивает счетчик владельцев!
-        std::unique_ptr<Boss> boss = std::make_unique<Boss>("Dragon", 200, 45, hero);
-
-        std::cout << "Счетчик владельцев hero после создания босса (weak_ptr): " << hero.use_count() << "\n"; // Все еще 1
-
-        // Создаем копию shared_ptr (второй владелец)
-        {
-            std::shared_ptr<Player> heroCopy = hero;
-            std::cout << "Счетчик владельцев hero (после копирования): " << hero.use_count() << "\n"; // 2
-
-            PrintState(*hero, *boss);
-            boss->AttackTarget(); // Босс успешно атакует через weak_ptr
-        } // heroCopy уничтожается здесь
-        std::cout << "Счетчик владельцев hero (копия уничтожена): " << hero.use_count() << "\n"; // 1
-
-        // Проверяем weak_ptr, пока объект жив
-        std::cout << "\n-- Босс атакует, пока игрок жив --\n";
-        boss->AttackTarget();
-
-        // Уничтожаем последнего владельца (игрока)
-        std::cout << "\n-- Уничтожаем последнего владельца (hero.reset()) --\n";
-        hero.reset();
-
-        // В этот момент сработает деструктор Player и Weapon!
-
-        std::cout << "\n-- Босс пытается атаковать мертвого (уничтоженного) игрока --\n";
-        boss->AttackTarget(); // weak_ptr::lock() вернет nullptr, босс корректно обработает это
-
-    } // Здесь уничтожается босс
-    std::cout << "Вышли из блока. Босс уничтожен.\n";
-
-    // ========================================= =
-        // 3. Массив умных указателей (замена new[]/delete[])
-        // ==========================================
-    {
-        std::cout << "\n[3. Массив умных указателей]\n";
-
-    // Массив динамических объектов (как в ЛР2, но без new/delete)
-        std::vector<std::unique_ptr<Player>>players;
-        players.push_back(std::make_unique<Player>("P1", 50, 1, Weapon::Type::eSword, "Sword1", 10));
-        players.push_back(std::make_unique<Player>("P2", 60, 1, Weapon::Type::eBow, "Bow1", 12));
-        for(const auto& p : players){
-            std::cout << "Игрок в массиве: " << p->GetName() << ", ОЗ:" << p->GetHealth() << "\n";
+    // Р”РµРјРѕРЅСЃС‚СЂР°С†РёСЏ РІРёСЂС‚СѓР°Р»СЊРЅРѕРіРѕ РјРµС‚РѕРґР° Describe
+    for (const auto& entity : entities) {
+        std::cout << entity->Describe() << "\n";
     }
-    } // Вектор уничтожается, вместе с ним уничтожаются все unique_ptr и объекты Player
 
-    std::cout << "\n=== Конец программы ===\n";
+    std::cout << "\n--- Р”РµРјРѕРЅСЃС‚СЂР°С†РёСЏ СЂР°Р±РѕС‚С‹ Clone() Рё РіР»СѓР±РѕРєРѕР№ РєРѕРїРёРё ---\n";
+    auto heroCopy = hero->Clone();
+    std::cout << "РћСЂРёРіРёРЅР°Р»: " << hero->GetName() << " (ID: " << hero->GetId() << ")\n";
+    std::cout << "РљРѕРїРёСЏ:    " << heroCopy->GetName() << " (ID: " << heroCopy->GetId() << ")\n";
+    std::cout << "Р’СЃРµРіРѕ СЃСѓС‰РЅРѕСЃС‚РµР№ СЃРѕР·РґР°РЅРѕ: " << BaseEntity::GetTotalCount() << "\n";
+
+    std::cout << "\n--- Р’С‹С…РѕРґ РёР· main (РїСЂРѕРІРµСЂРєР° РІРёСЂС‚СѓР°Р»СЊРЅРѕРіРѕ РґРµСЃС‚СЂСѓРєС‚РѕСЂР°) ---\n";
+    // РџСЂРё РѕС‡РёСЃС‚РєРµ РІРµРєС‚РѕСЂР° entities Р±СѓРґСѓС‚ РІС‹Р·РІР°РЅС‹ РґРµСЃС‚СЂСѓРєС‚РѕСЂС‹ Player Рё Boss (С‡РµСЂРµР· BaseEntity).
+    // Р•СЃР»Рё Р±С‹ РґРµСЃС‚СЂСѓРєС‚РѕСЂ BaseEntity РЅРµ Р±С‹Р» РІРёСЂС‚СѓР°Р»СЊРЅС‹Рј, РїР°РјСЏС‚СЊ РЅР°СЃР»РµРґРЅРёРєРѕРІ РЅРµ РѕС‡РёСЃС‚РёР»Р°СЃСЊ Р±С‹ РєРѕСЂСЂРµРєС‚РЅРѕ!
     return 0;
 }
+
+
+
+
+

@@ -1,46 +1,33 @@
-﻿//
-// ФАЙЛ boss.hpp
-//
-#pragma once
+﻿#pragma once
 
+#include "entity.hpp"
 #include "player.hpp"
-#include <cstdint>
-#include <string>
-#include <memory>
 
 namespace game
 {
 
-    class Boss
+    class Boss : public BaseEntity
     {
     private:
-        std::string m_name{ "Boss" };
-        std::int32_t m_health{ 300 };
-        std::int32_t m_damage{ 40 };
-
-        // АГРЕГАЦИЯ: босс использует weak_ptr, чтобы наблюдать за игроком, не владея им
+        int m_damage;
         std::weak_ptr<Player> m_target;
 
     public:
-        Boss();
-        Boss(const std::string& name, std::int32_t health, std::int32_t damage, std::shared_ptr<Player> target);
+        Boss(const std::string& name, int health, int damage, std::shared_ptr<Player> target);
 
-        Boss(const Boss&) = default;
-        Boss& operator=(const Boss&) = default;
-        Boss(Boss&&) = default;
-        Boss& operator=(Boss&&) = default;
+        void TakeDamage(int damage) override;
+        std::unique_ptr<BaseEntity> Clone() const override;
 
-        ~Boss();
+        // Переопределяем БЕЗ вызова базового метода (полностью меняем)
+        std::string Describe() const override;
 
-        [[nodiscard]] const std::string& GetName() const { return m_name; }
-        [[nodiscard]] std::int32_t GetHealth() const { return m_health; }
-        [[nodiscard]] bool IsAlive() const { return m_health > 0; }
-
-        // Установка цели
         void SetTarget(std::shared_ptr<Player> target) { m_target = target; }
-
         bool AttackTarget();
-        void TakeDamage(std::int32_t damage);
     };
 
 } // namespace game
+
+
+
+
+

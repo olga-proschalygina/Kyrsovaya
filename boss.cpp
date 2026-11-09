@@ -1,74 +1,42 @@
-﻿//
-// ФАЙЛ boss.cpp
-//
-#include "boss.hpp"
-#include <iostream>
+﻿#include "boss.hpp"
 
 namespace game
 {
 
-    Boss::Boss()
-        : m_name{ "Boss" }, m_health{ 300 }, m_damage{ 40 }
+    Boss::Boss(const std::string& name, int health, int damage, std::shared_ptr<Player> target)
+        : BaseEntity(name, health) // Вызов конструктора базы
+        , m_damage(damage > 0 ? damage : 1)
+        , m_target(target)
     {}
 
-    Boss::Boss(const std::string& name, std::int32_t health, std::int32_t damage, std::shared_ptr<Player> target)
-        : m_name{ name }, m_health{ health }, m_damage{ damage }, m_target{ target }
+    void Boss::TakeDamage(int damage)
     {
-        if (m_health <= 0)
-        {
-            std::cerr<< "[Boss] Ошибка: здоровье не может быть <= 0. Установлено 1.\n";
-            m_health = 1;
-        }
-        if (m_damage <= 0)
-        {
-            std::cerr << "[Boss] Ошибка: урон не может быть <= 0. Установлено 1.\n";
-            m_damage = 1;
-        }
+        if (damage <= 0) return;
+        m_health = (m_health - damage < 0) ? 0 : m_health - damage;
+        std::cout << "[Boss] " << m_name << " получил урон " << damage << ". ОЗ: " << m_health << "\n";
     }
 
-    Boss::~Boss()
+    std::unique_ptr<BaseEntity> Boss::Clone() const
     {
-        std::cout << "[Boss] Уничтожается босс: " << m_name << "\n";
+        // Для клонирования босса нужен пустой shared_ptr, так как weak_ptr не владеет
+        return std::make_unique<Boss>(m_name, m_health, m_damage, nullptr);
+    }
+
+    std::string Boss::Describe() const
+    {
+        // Полностью заменяем описание (без вызова базового метода)
+        return "БОСС: " + m_name + " (Урон: " + std::to_string(m_damage) + ")";
     }
 
     bool Boss::AttackTarget()
     {
-        // Пытаемся получить shared_ptr из weak_ptr
-        std::shared_ptr<Player> target = m_target.lock();
-
-        // Проверка правила: цель не задана или уже уничтожена
-        if (target == nullptr)
-        {
-            std::cerr << "[Boss] Отказ: цель не задана или уже мертва/уничтожена.\n";
+        auto target = m_target.lock();
+        if (!target || !target->IsAlive()) {
+            std::cout << "[Boss] Отказ: цель мертва или отсутствует.\n";
             return false;
         }
-
-        if (!target->IsAlive())
-        {
-            std::cerr << "[Boss] Отказ: цель уже мертва.\n";
-            return false;
-        }
-
-        std::cout << "[Boss] " << m_name << " атакует " << target->GetName()
-            << " на " << m_damage << " урона.\n";
         target->TakeDamage(m_damage);
         return true;
-    }
-
-    void Boss::TakeDamage(std::int32_t damage)
-    {
-        if (damage <= 0)
-        {
-            std::cerr << "[Boss] Ошибка: урон не может быть <= 0.\n";
-            return;
-        }
-        if (m_health - damage < 0)
-            m_health = 0;
-        else
-            m_health -= damage;
-
-        std::cout << "[Boss] " << m_name << " получил урон " << damage
-             <<". ОЗ: " << m_health << "\n";
     }
 
 } // namespace game
