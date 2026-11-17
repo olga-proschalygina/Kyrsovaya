@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "game_project\\x64\\Debug\\player.obj",
+            "outputs": [
+                "game_project\\x64\\Debug\\player.hpp.obj.dt.module.json",
+                "game_project\\x64\\Debug\\player.hpp.obj.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}

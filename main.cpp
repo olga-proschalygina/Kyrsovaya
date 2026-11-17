@@ -1,54 +1,76 @@
-// Лабораторная работа № 1. Вариант N68
-// Выполнил: Прощалыгина О. А., группа ПИ-53.
+п»ї#include "player.hpp"
+#include "boss.hpp"
+#include "game_exceptions.hpp"
 #include <iostream>
-using namespace std;
-// ===== Расчётные функции варианта =====
-// Площадь прямоугольника со сторонами a и b
-double rectangleArea(double a, double b) {
-	return a * b;
+#include <vector>
+#include <windows.h>
+#include <locale.h>
+
+using namespace game;
+
+// Р¤СѓРЅРєС†РёСЏ, СЂР°Р±РѕС‚Р°СЋС‰Р°СЏ РўРћР›Р¬РљРћ С‡РµСЂРµР· РёРЅС‚РµСЂС„РµР№СЃ (РЅРµ Р·РЅР°СЏ РєР»Р°СЃСЃРѕРІ)
+void ApplyDamage(IAttackable& target, int damage)
+{
+    std::cout << "[РЎРёСЃС‚РµРјР°] РќР°РЅРѕСЃРёРј СѓСЂРѕРЅ С‡РµСЂРµР· РёРЅС‚РµСЂС„РµР№СЃ IAttackable...\n";
+    target.ReceiveDamage(damage);
 }
-// Периметр прямоугольника со сторонами a и b
-double rectanglePerimeter(double a, double b) {
-	return 2 * (a + b);
-}
-// Диагональ прямоугольника со сторонами a и b
-double rectangleDiagonal(double a, double b) {
-	return sqrt(a * a + b * b); // не забудьте #include <cmath>
-}
-// ===== Главная функция: меню =====
-int main() {
-	int choice;
-	double a, b;
-	do {
-		cout << "\n=== Вариант N: расчёты для прямоугольника ===\n";
-		cout << "1. Площадь\n";
-		cout << "2. Периметр\n";
-		cout << "3. Диагональ\n";
-		cout << "0. Выход\n";
-		cout << "Выберите пункт: ";
-		cin >> choice;
-		switch (choice) {
-		case 1:
-			cout << "Введите стороны a и b: ";
-			cin >> a >> b;
-			cout << "Площадь = " << rectangleArea(a, b) << "\n";
-			break;
-		case 2:
-			cout << "Введите стороны a и b: ";
-			cin >> a >> b;
-			cout << "Периметр = " << rectanglePerimeter(a, b) << "\n";
-			break;
-		case 3:
-			cout << "Введите стороны a и b: ";
-			cin >> a >> b;
-			cout << "Диагональ = " << rectangleDiagonal(a, b) << "\n";
-			break;
-		case 0:
-			cout << "Работа завершена.\n";
-			break;
-		default:
-			cout << "Такого пункта нет.\n";
-		}
-	} while (choice != 0);
-	return 0;
+
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+    SetConsoleOutputCP(65001);
+    std::cout << "=== Р›Р  5: РџРѕР»РёРјРѕСЂС„РёР·Рј, РёРЅС‚РµСЂС„РµР№СЃС‹, РёСЃРєР»СЋС‡РµРЅРёСЏ ===\n\n";
+
+    try {
+        auto hero = std::make_shared<Player>("Hero", 100, 1, Weapon::Type::eSword, "Excalibur", 20);
+        auto boss = std::make_unique<Boss>("Dragon", 200, 45, hero);
+
+        std::cout << "\n--- 1. РРЅС‚РµСЂС„РµР№СЃС‹ Рё РјРЅРѕР¶РµСЃС‚РІРµРЅРЅРѕРµ РЅР°СЃР»РµРґРѕРІР°РЅРёРµ ---\n";
+        // РџРµСЂРµРґР°РµРј РѕР±СЉРµРєС‚С‹ С‡РµСЂРµР· РёРЅС‚РµСЂС„РµР№СЃ
+        ApplyDamage(*hero, 10);
+        ApplyDamage(*boss, 50);
+
+        std::cout << "\n--- 2. Р Р°РЅРЅРµРµ Рё РїРѕР·РґРЅРµРµ СЃРІСЏР·С‹РІР°РЅРёРµ ---\n";
+        BaseEntity* ptr = hero.get();
+        // Р Р°РЅРЅРµРµ СЃРІСЏР·С‹РІР°РЅРёРµ (РІС‹Р·С‹РІР°РµС‚СЃСЏ РјРµС‚РѕРґ BaseEntity)
+        std::cout << "Р Р°РЅРЅРµРµ: " << ptr->GetEarlyBindingType() << "\n";
+        // РџРѕР·РґРЅРµРµ СЃРІСЏР·С‹РІР°РЅРёРµ (РІС‹Р·С‹РІР°РµС‚СЃСЏ РјРµС‚РѕРґ Player)
+        std::cout << "РџРѕР·РґРЅРµРµ: " << ptr->GetTypeName() << "\n";
+
+        std::cout << "\n--- 3. РџСЂРѕРІРµСЂРєР° С‚РёРїР° (dynamic_cast) ---\n";
+        BaseEntity* entities[] = { hero.get(), boss.get() };
+        for (auto* e : entities) {
+            // РџСЂРѕРІРµСЂСЏРµРј, СЂРµР°Р»РёР·СѓРµС‚ Р»Рё РѕР±СЉРµРєС‚ РёРЅС‚РµСЂС„РµР№СЃ (С…РѕС‚СЏ С‚СѓС‚ РІСЃРµ СЂРµР°Р»РёР·СѓСЋС‚, РґР»СЏ РїСЂРёРјРµСЂР°)
+            if (auto* attackable = dynamic_cast<IAttackable*>(e)) {
+                std::cout << e->GetName() << " СѓРјРµРµС‚ РїРѕР»СѓС‡Р°С‚СЊ СѓСЂРѕРЅ.\n";
+            }
+        }
+
+        std::cout << "\n--- 4. РљРѕРЅС„РёРіСѓСЂРёСЂРѕРІР°РЅРёРµ (СЃРјРµРЅР° РїРѕРІРµРґРµРЅРёСЏ) ---\n";
+        std::cout << "РћР±С‹С‡РЅР°СЏ Р°С‚Р°РєР°:\n";
+        hero->Attack();
+
+        std::cout << "РњРµРЅСЏРµРј С‚Р°РєС‚РёРєСѓ РЅР° РєСЂРёС‚РёС‡РµСЃРєСѓСЋ:\n";
+        hero->SetStrategy(std::make_unique<CriticalDamageStrategy>());
+        hero->Attack();
+
+        std::cout << "\n--- 5. РСЃРєР»СЋС‡РµРЅРёСЏ ---\n";
+        std::cout << "РџС‹С‚Р°РµРјСЃСЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р·РµР»СЊРµ (РѕРЅРѕ РµСЃС‚СЊ):\n";
+        hero->UsePotion(); // РЈСЃРїРµС€РЅРѕ
+
+        std::cout << "РџС‹С‚Р°РµРјСЃСЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р·РµР»СЊРµ РµС‰Рµ СЂР°Р· (РёС… Р±РѕР»СЊС€Рµ РЅРµС‚):\n";
+        hero->UsePotion(); // Р‘СЂРѕСЃРёС‚ РёСЃРєР»СЋС‡РµРЅРёРµ GameRuleException
+
+    }
+    catch (const GameRuleException& ex) {
+        // РџРµСЂРµС…РІР°С‚ С‡Р°СЃС‚РЅРѕРіРѕ РёСЃРєР»СЋС‡РµРЅРёСЏ
+        std::cerr << "\n[РћРЁРР‘РљРђ РР“Р Р«]: " << ex.what() << "\n";
+    }
+    catch (const std::exception& ex) {
+        // РџРµСЂРµС…РІР°С‚ РѕР±С‰РµРіРѕ РёСЃРєР»СЋС‡РµРЅРёСЏ (РёРґРµС‚ РїРѕСЃР»Рµ С‡Р°СЃС‚РЅРѕРіРѕ)
+        std::cerr << "\n[РЎРРЎРўР•РњРќРђРЇ РћРЁРР‘РљРђ]: " << ex.what() << "\n";
+    }
+
+    std::cout << "\n=== РљРѕРЅРµС† РїСЂРѕРіСЂР°РјРјС‹ ===\n";
+    return 0;
 }
