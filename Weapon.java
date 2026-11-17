@@ -42,7 +42,9 @@ public class Weapon {
     public int getDamage() {
         return damage;
     }
-
+    public Type getType(){  
+        return type;
+    }
    @Override
     public String toString() {
         return name + " (" + damage + ")";

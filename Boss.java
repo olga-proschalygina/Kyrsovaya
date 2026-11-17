@@ -1,66 +1,45 @@
-public class Boss {
-    private final String name;
-    private int health;
+public class Boss extends BaseEntity {
     private final int damage;
-    
-    // АГРЕГАЦИЯ: босс использует игрока, созданного извне
     private Player target;
 
     public Boss(String name, int health, int damage, Player target) {
-        this.name = name;
-        if (health <= 0) {
-            System.err.println("[Boss] Ошибка: здоровье не может быть <= 0. Установлено 1.");
-            this.health = 1;
-        } else {
-            this.health = health;
-        }
-        
+        super(name, health);
         if (damage <= 0) {
-            System.err.println("[Boss] Ошибка: урон не может быть <= 0. Установлено 1.");
-            this.damage = 1;
-        } else {
-            this.damage = damage;
+            throw new GameRuleException("Урон босса не может быть <= 0");
         }
+        this.damage = damage;
         this.target = target;
     }
 
-    public boolean attackTarget() {
-        // Проверка правила: нельзя атаковать без цели
-        if (target == null) {
-            System.err.println("[Boss] Отказ: цель не задана.");
-            return false;
-        }
-        // Проверка правила: нельзя атаковать мертвую цель
-        if (!target.isAlive()) {
-            System.err.println("[Boss] Отказ: цель уже мертва.");
-            return false;
-        }
-
-        System.out.println("[Boss] " + name + " атакует " + target.getName() + " на " + damage + " урона.");
-        target.takeDamage(damage);
-        return true;
+    public Boss(Boss other) {
+        super(other);
+        this.damage = other.damage;
+        this.target = other.target;
     }
-
-    public void takeDamage(int damage) {
-        if (damage <= 0) {
-            System.err.println("[Boss] Ошибка: урон не может быть <= 0.");
-            return;
-        }
-        if (health - damage < 0) {
-            health = 0;
-        } else {
-            health -= damage;
-        }
-        System.out.println("[Boss] " + name + " получил урон " + damage + ". ОЗ: " + health);
-    }
-
-    public String getName() { return name; }
-    public int getHealth() { return health; }
-    public boolean isAlive() { return health > 0; }
-    public void setTarget(Player target) { this.target = target; }
 
     @Override
-    public String toString() {
-        return "Босс: " + name + ", ОЗ: " + health;
+    public BaseEntity cloneEntity() {
+        return new Boss(this);
     }
+
+    @Override
+    public String describe() {
+        return "БОСС: " + name + " (Урон: " + damage + ")";
+    }
+
+    @Override
+    public String getTypeName() { return "Босс"; }
+
+    @Override
+    public String getAttackMessage() { return "Босс атакует!"; }
+
+    public void attackTarget() {
+        if (target == null || !target.isAlive()) {
+            throw new GameRuleException("Босс не может атаковать: цель мертва или отсутствует.");
+        }
+        System.out.println("[Boss] " + name + " атакует " + target.getName() + "!");
+        target.receiveDamage(damage);
+    }
+
+    public void setTarget(Player target) { this.target = target; }
 }

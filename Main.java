@@ -1,76 +1,70 @@
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 public class Main {
+    // Функция, работающая через интерфейс (демонстрация полиморфизма)
+    public static void applyDamage(IAttackable target, int damage) {
+        System.out.println("[Система] Наносим урон через интерфейс IAttackable...");
+        target.receiveDamage(damage);
+    }
 
     public static void main(String[] args) {
-        System.out.println("=== ЛР 3. Часть 1. Java (Управляемая память) ===\n");
-
-        // ==========================================
-        // 1. Ссылки и копии
-        // ==========================================
-        System.out.println("\n[1. Ссылки и копии: переменная хранит ссылку]");
-        Player p1 = new Player("Hero1", 100, 1, Weapon.Type.SWORD, "Excalibur", 25);
-        Player p2 = p1; // Копируется ССЫЛКА, а не объект!
-
-        p2.takeDamage(40); // Наносим урон через "вторую" переменную
-        System.out.println("Состояние p1: " + p1); // ОЗ p1 тоже уменьшилось, т.к. это один объект
-        System.out.println("p1 == p2 ? " + (p1 == p2)); // true
-
-        // ==========================================
-        // 2. Освобождение ресурса (try-with-resources)
-        // ==========================================
-        System.out.println("\n[2. Освобождение ресурса без деструктора]");
-        try (Battlelog log = new Battlelog("Битва с Драконом")) {
-            log.write("Игрок входит в арену");
-            log.write("Босс атакует");
-        } // Здесь автоматически вызывается log.close()
-        System.out.println("Вышли из блока try. Ресурс освобожден.");
-
-        // ==========================================
-        // 3. Работа композиции и агрегации
-        // ==========================================
-        System.out.println("\n[3. Композиция и агрегация]");
-        Player hero = new Player("Hero", 100, 2, Weapon.Type.SWORD, "Sword", 20);
-        Boss boss = new Boss("Dragon", 200, 45, hero); // hero создан вне босса и передан ему
-
-        System.out.println(hero);
-        System.out.println(boss);
-
-        boss.attackTarget();
-        hero.attack();
-
-        // ==========================================
-        // 4. Сборщик мусора (Garbage Collector)
-        // ==========================================
-        System.out.println("\n[4. Сборщик мусора (GC)]");
-        // Создаем объект и слабую ссылку на него
-        Player temp = new Player("Ghost", 10, 0, Weapon.Type.BOW, "Bow", 5);
-        WeakReference<Player> watcher = new WeakReference<>(temp);
-        
-        System.out.println("Объект жив? " + (watcher.get() != null)); // true
-        
-        temp = null; // Убираем последнюю обычную ссылку
-        System.out.println("temp = null. Просим GC собрать мусор...");
-        
-        System.gc(); // Просим сборщик мусора запуститься (не гарантируется, но в учебных целях сработает)
-        try { Thread.sleep(100); } catch (InterruptedException e) {} // Даем GC время
-        
-        System.out.println("Объект жив после GC? " + (watcher.get() != null)); // false
-
-        // ==========================================
-        // 5. Массив объектов (аналог из C++)
-        // ==========================================
-        System.out.println("\n[5. Массив объектов в куче]");
-        List<Player> players = new ArrayList<>();
-        players.add(new Player("P1", 50, 1, Weapon.Type.SWORD, "Sword1", 10));
-        players.add(new Player("P2", 60, 1, Weapon.Type.BOW, "Bow1", 12));
-
-        for (Player p : players) {
-            System.out.println("Игрок в массиве: " + p.getName() + ", ОЗ: " + p.getHealth());
+        // Пытаемся настроить вывод, чтобы русские буквы отображались в VS Code
+        try {
+            System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8.name()));
+        } catch (Exception e) {
+            // Если не получилось, продолжаем работу
         }
-        // Память очистится сборщиком мусора автоматически, никаких delete нет
+
+        System.out.println("=== ЛР 5: Полиморфизм в Java ===\n");
+
+        try {
+            // 1. Создание объектов (демонстрация интерфейсов и наследования)
+            Player hero = new Player("Hero", 100, 1, Weapon.Type.SWORD, "Excalibur", 20);
+            Boss boss = new Boss("Dragon", 200, 45, hero);
+
+            System.out.println("\n--- 1. Интерфейсы и полиморфизм ---");
+            // Передаем объекты через интерфейс IAttackable
+            applyDamage(hero, 10);
+            applyDamage(boss, 50);
+
+            System.out.println("\n--- 2. Раннее и позднее связывание ---");
+            BaseEntity ptr = hero;
+            // Раннее связывание (вызывается метод базового класса, так как он final)
+            System.out.println("Раннее: " + ptr.getEarlyBindingType());
+            // Позднее связывание (вызывается переопределенный метод Player)
+            System.out.println("Позднее: " + ptr.getTypeName());
+
+            System.out.println("\n--- 3. Проверка типа (instanceof) ---");
+            BaseEntity[] entities = { hero, boss };
+            for (BaseEntity e : entities) {
+                if (e instanceof IAttackable) {
+                    System.out.println(e.getName() + " умеет получать урон (реализует IAttackable).");
+                }
+            }
+
+            System.out.println("\n--- 4. Конфигурирование (смена поведения) ---");
+            System.out.println("Обычная атака:");
+            hero.attack(); // Урон 20
+
+            System.out.println("Меняем тактику на критическую:");
+            hero.setStrategy(new CriticalDamageStrategy());
+            hero.attack(); // Урон 40
+
+            System.out.println("\n--- 5. Исключения ---");
+            System.out.println("Используем зелье (оно есть):");
+            hero.usePotion(); // Успешно
+
+            System.out.println("Используем зелье еще раз (их нет):");
+            hero.usePotion(); // Здесь должно вылететь исключение!
+
+        } catch (GameRuleException e) {
+            // Перехват частного (кастомного) исключения
+            System.err.println("\n[ОШИБКА ИГРЫ]: " + e.getMessage());
+        } catch (Exception e) {
+            // Перехват общего исключения (идет после частного)
+            System.err.println("\n[СИСТЕМНАЯ ОШИБКА]: " + e.getMessage());
+        }
 
         System.out.println("\n=== Конец программы ===");
     }
