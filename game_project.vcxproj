@@ -147,7 +147,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="boss.hpp" />
+    <ClInclude Include="combat_strategy.hpp" />
     <ClInclude Include="entity.hpp" />
+    <ClInclude Include="game_exceptions.hpp" />
+    <ClInclude Include="iattackable.hpp" />
     <ClInclude Include="player.hpp" />
     <ClInclude Include="weapon.hpp" />
   </ItemGroup>

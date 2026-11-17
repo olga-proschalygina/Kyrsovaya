@@ -6,6 +6,7 @@
         "Includes": [
             "c:\\users\\admin\\desktop\\visual studio\\game_project\\player.hpp",
             "c:\\users\\admin\\desktop\\visual studio\\game_project\\entity.hpp",
+            "c:\\users\\admin\\desktop\\visual studio\\game_project\\iattackable.hpp",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\string",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\yvals_core.h",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\vcruntime.h",
@@ -99,6 +100,8 @@
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\memory",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\typeinfo",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\vcruntime_typeinfo.h",
+            "c:\\users\\admin\\desktop\\visual studio\\game_project\\weapon.hpp",
+            "c:\\users\\admin\\desktop\\visual studio\\game_project\\combat_strategy.hpp",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\iostream",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\istream",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\__msvc_ostream.hpp",
@@ -128,7 +131,7 @@
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\clocale",
             "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\ucrt\\locale.h",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\ostream",
-            "c:\\users\\admin\\desktop\\visual studio\\game_project\\weapon.hpp"
+            "c:\\users\\admin\\desktop\\visual studio\\game_project\\game_exceptions.hpp"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []

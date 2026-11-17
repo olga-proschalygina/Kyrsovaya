@@ -2,33 +2,38 @@
 
 #include "entity.hpp"
 #include "weapon.hpp"
+#include "combat_strategy.hpp"
+#include <memory>
 
 namespace game
 {
 
-    // final запрещает дальнейшее наследование от Player
     class Player final : public BaseEntity
     {
     private:
         Weapon m_weapon;
         int m_potions;
+        std::unique_ptr<ICombatStrategy> m_strategy;
 
     public:
         Player(const std::string& name, int health, int potions, Weapon::Type weaponType, const std::string& weaponName, int weaponDamage);
 
-        // Правило нуля (поля сами управляют памятью, но нам нужен клонирующий конструктор для глубокой копии)
+        // Конструктор копирования (нужен для Clone)
         Player(const Player& other);
 
-        // Переопределяем чисто виртуальные методы
-        void TakeDamage(int damage) override;
+        ~Player() override = default;
+
+        // Переопределение методов базового класса и интерфейса
+        void ReceiveDamage(int damage) override;
         std::unique_ptr<BaseEntity> Clone() const override;
-
-        // Переопределяем с вызовом базового метода
         std::string Describe() const override;
+        std::string GetTypeName() const override { return "Игрок"; }
+        std::string GetAttackMessage() const override { return "Игрок атакует!"; }
 
-        bool UsePotion();
+        // Методы предметной области
+        void UsePotion();
         int Attack();
-        const Weapon& GetWeapon() const { return m_weapon; }
+        void SetStrategy(std::unique_ptr<ICombatStrategy> strategy);
     };
 
 } // namespace game

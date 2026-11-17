@@ -1,42 +1,59 @@
 ﻿#include "boss.hpp"
+#include "game_exceptions.hpp"
+#include <iostream>
 
 namespace game
 {
 
     Boss::Boss(const std::string& name, int health, int damage, std::shared_ptr<Player> target)
-        : BaseEntity(name, health) // Вызов конструктора базы
+        : BaseEntity(name, health)
         , m_damage(damage > 0 ? damage : 1)
         , m_target(target)
+    {
+        if (damage <= 0) {
+            throw GameRuleException("Урон босса не может быть <= 0");
+        }
+    }
+
+    Boss::Boss(const Boss& other)
+        : BaseEntity(other)
+        , m_damage(other.m_damage)
+        , m_target(other.m_target) // Копируем weak_ptr
     {}
 
-    void Boss::TakeDamage(int damage)
+    void Boss::ReceiveDamage(int damage)
     {
-        if (damage <= 0) return;
-        m_health = (m_health - damage < 0) ? 0 : m_health - damage;
-        std::cout << "[Boss] " << m_name << " получил урон " << damage << ". ОЗ: " << m_health << "\n";
+        BaseEntity::ReceiveDamage(damage);
     }
 
     std::unique_ptr<BaseEntity> Boss::Clone() const
     {
-        // Для клонирования босса нужен пустой shared_ptr, так как weak_ptr не владеет
-        return std::make_unique<Boss>(m_name, m_health, m_damage, nullptr);
+        return std::make_unique<Boss>(*this);
     }
 
     std::string Boss::Describe() const
     {
-        // Полностью заменяем описание (без вызова базового метода)
         return "БОСС: " + m_name + " (Урон: " + std::to_string(m_damage) + ")";
     }
 
-    bool Boss::AttackTarget()
+    void Boss::SetTarget(std::shared_ptr<Player> target)
+    {
+        m_target = target;
+    }
+
+    void Boss::AttackTarget()
     {
         auto target = m_target.lock();
-        if (!target || !target->IsAlive()) {
-            std::cout << "[Boss] Отказ: цель мертва или отсутствует.\n";
-            return false;
+
+        if (!target) {
+            throw GameRuleException("Босс не может атаковать: цель уничтожена или отсутствует.");
         }
-        target->TakeDamage(m_damage);
-        return true;
+        if (!target->IsAlive()) {
+            throw GameRuleException("Босс не может атаковать: цель уже мертва.");
+        }
+
+        std::cout << "[Boss] " << m_name << " атакует " << target->GetName() << "!\n";
+        target->ReceiveDamage(m_damage);
     }
 
 } // namespace game
