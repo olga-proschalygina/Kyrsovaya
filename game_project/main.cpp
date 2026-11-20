@@ -1,220 +1,31 @@
-<<<<<<< HEAD
-#include "game_world.hpp"
+п»ї#include "game_world.hpp"
 #include <iostream>
+#include <vector>
 #include <windows.h>
-#include <locale.h>
 
 using namespace game;
 
-int main() {    
+int main() {
     SetConsoleOutputCP(65001);
-    std::cout << "=== Р›Р  3: РЈРјРЅС‹Рµ СѓРєР°Р·Р°С‚РµР»Рё (GameWorld) ===\n\n";
+    std::cout << "=== Р›Р  4: РќР°СЃР»РµРґРѕРІР°РЅРёРµ (C++) ===\n\n";
 
-    // 1. Р”РµРјРѕРЅСЃС‚СЂР°С†РёСЏ unique_ptr
-    {
-        auto boss = std::make_unique<Boss>("UniqueBoss", 200, 45);
-        std::cout << "Р‘РѕСЃСЃ СЃРѕР·РґР°РЅ (unique_ptr).\n";
-    }
-    std::cout << "Р’С‹С€Р»Рё РёР· Р±Р»РѕРєР°. Р‘РѕСЃСЃ СѓРЅРёС‡С‚РѕР¶РµРЅ.\n\n";
+    std::cout << "--- РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚РѕРІ ---\n";
+    auto hero = std::make_shared<Player>("Hero", 100, 2, "Excalibur", 25);
+    auto boss = std::make_unique<Boss>("Dragon", 200, 45);
 
-    // 2. Р”РµРјРѕРЅСЃС‚СЂР°С†РёСЏ shared_ptr Рё GameWorld
-    {
-        auto hero = std::make_shared<Player>("Hero", 100, 2, Weapon::Type::eSword, "Excalibur", 25);
-        auto boss = std::make_unique<Boss>("Dragon", 200, 45);
+    std::cout << "\n--- РџРѕР»РёРјРѕСЂС„РёР·Рј (С‡РµСЂРµР· Р±Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ) ---\n";
+    std::vector < std::unique_ptr < BaseEntity>> entities;
+    entities.push_back(hero->Clone());
+    entities.push_back(boss->Clone());
 
-        // РџРµСЂРµРґР°РµРј РёС… РІ РјРёСЂ (Р‘РѕСЃСЃ РїРµСЂРµРґР°РµС‚СЃСЏ РїРѕ move, РРіСЂРѕРє РєРѕРїРёСЂСѓРµС‚СЃСЏ)
-        GameWorld world(hero, std::move(boss));
-
-        std::cout << "Р’Р»Р°РґРµР»СЊС†РµРІ hero (РІ main): " << hero.use_count() << "\n"; // 1
-
-        world.PrintState();
-        world.StartCombat();
-        world.PrintState();
-    } // РЈРЅРёС‡С‚РѕР¶Р°РµС‚СЃСЏ GameWorld (РІРјРµСЃС‚Рµ СЃ Boss Рё Player)
-
-=======
-#include "boss.hpp"
-#include "player.hpp"
-#include "weapon.hpp"
-#include <iostream>
-#include <locale.h>
-#include <windows.h>
-
-using namespace game;
-
-static void PrintState(const Player& player, const Boss& boss)
-{
-    std::cout << "--- Состояние ---\n";
-    std::cout << "Игрок: " << player.GetName()
-        << ", ОЗ: " << player.GetHealth() << "/" << player.GetMaxHealth()
-        << ", зелий: " << player.GetPotions()
-        << ", оружие: " << player.GetWeapon().GetName()
-        << " (" << player.GetWeapon().GetDamage() << ")\n";
-    std::cout<< "Босс: " << boss.GetName()
-        << ", ОЗ: " << boss.GetHealth() << "\n";
-    std::cout << "-----------------\n";
-}
-
-int main()
-{  
-    setlocale(LC_ALL, "Russian");
-    std::cout << "=== Сценарий 5: смерть от босса ===\n\n";
-
-    // --- Статическая инициализация ---
-    {
-        std::cout << "\n[Статическая инициализация]\n";
-        Player staticPlayer("StaticHero", 100, 2, Weapon::Type::eSword, "SteelSword", 15);
-        Boss staticBoss("StaticBoss", 200, 30, &staticPlayer);
-
-        PrintState(staticPlayer, staticBoss);
-        staticBoss.AttackTarget();
-        staticPlayer.Attack();
-        PrintState(staticPlayer, staticBoss);
+    for (const auto& e : entities) {
+        std::cout << e->Describe() << "\n";
     }
 
-    // --- Динамическая инициализация ---
-    {
-        std::cout << "\n[Динамическая инициализация new/delete]\n";
-        auto* dynPlayer = new Player("DynHero", 100, 1, Weapon::Type::eBow, "LongBow", 12);
-        auto* dynBoss = new Boss("DynBoss", 150, 35, dynPlayer);
+    std::cout << "\n--- Р‘РѕР№ С‡РµСЂРµР· GameWorld ---\n";
+    GameWorld world(hero, std::move(boss));
+    world.StartCombat();
 
-        PrintState(*dynPlayer, *dynBoss);
-        dynBoss->AttackTarget();
-        dynPlayer->Attack();
-        PrintState(*dynPlayer, *dynBoss);
-
-        delete dynBoss;
-        delete dynPlayer;
-    }
-
-    // --- Ссылки и указатели ---
-    {
-        std::cout << "\n[Работа по ссылке и указателю]\n";
-        Player refPlayer("RefHero", 80, 2, Weapon::Type::eSpear, "Spear", 18);
-        Boss   refBoss("RefBoss", 120, 25, &refPlayer);
-
-        Player& playerRef = refPlayer;
-        Boss* bossPtr = &refBoss;
-
-        PrintState(playerRef, *bossPtr);
-        bossPtr->AttackTarget();
-        playerRef.Attack();
-        PrintState(playerRef, *bossPtr);
-    }
-
-    // --- Динамический массив объектов класса ---
-    {
-        std::cout << "\n[Динамический массив объектов класса]\n";
-        Player* players = new Player[2]{
-            Player("P1", 50, 1, Weapon::Type::eSword, "Sword1", 10),
-            Player("P2", 60, 1, Weapon::Type::eBow, "Bow1", 12)
-        };
-
-        std::cout << "Игрок 1: " << players[0].GetName()
-            << ", ОЗ: " << players[0].GetHealth() << "\n";
-        std::cout << "Игрок 2: " << players[1].GetName()
-            << ", ОЗ: " << players[1].GetHealth() << "\n";
-
-        delete[] players;
-    }
-
-    // --- Массив динамических объектов класса ---
-    {
-        std::cout << "\n[Массив динамических объектов класса]\n";
-        auto** playerPtrs = new Player * [2];
-        playerPtrs[0] = new Player("DP1", 70, 1, Weapon::Type::eSpear, "Spear1", 15);
-        playerPtrs[1] = new Player("DP2", 90, 2, Weapon::Type::eSword, "Sword2", 20);
-
-        std::cout << "Игрок 1: " << playerPtrs[0]->GetName()
-            << ", ОЗ: " << playerPtrs[0]->GetHealth() << "\n";
-        std::cout << "Игрок 2: " << playerPtrs[1]->GetName()
-            << ", ОЗ: " << playerPtrs[1]->GetHealth() << "\n";
-
-        delete playerPtrs[0];
-        delete playerPtrs[1];
-        delete[] playerPtrs;
-    }
-
-    // --- Время жизни: композиция ---
-    {
-        std::cout << "\n[Композиция: Player содержит Weapon]\n";
-        std::cout << "Входим во вложенный блок...\n";
-        {
-            Player innerPlayer("InnerHero", 100, 1, Weapon::Type::eSword, "InnerSword", 15);
-            std::cout << "Игрок создан, оружие: " << innerPlayer.GetWeapon().GetName() << "\n";
-            std::cout << "Выходим из вложенного блока...\n";
-        }
-        std::cout<< "Вышли из блока. Деструкторы Player и Weapon вызваны автоматически.\n";
-    }
-
-    // -- - Время жизни : агрегация-- -
-    {
-        std::cout << "\n[Агрегация: Boss использует Player]\n";
-        Player aggPlayer("AggHero", 100, 1, Weapon::Type::eSword, "AggSword", 15);
-
-        {
-            std::cout << "Входим во вложенный блок, создаём босса...\n";
-            Boss aggBoss("AggBoss", 100, 20, &aggPlayer);
-            aggBoss.AttackTarget();
-            aggPlayer.Attack();
-            std::cout << "Выходим из вложенного блока, босс уничтожается...\n";
-        }
-
-        std::cout << "Босс уничтожен, но игрок продолжает существовать.\n";
-        std::cout << "Игрок: " << aggPlayer.GetName()
-            << ", ОЗ: " << aggPlayer.GetHealth() << "/" << aggPlayer.GetMaxHealth() << "\n";
-
-        aggPlayer.TakeDamage(10);
-        std::cout << "Игрок после урона: ОЗ = " << aggPlayer.GetHealth() << "\n";
-        std::cout << "Игрок жив: " <<(aggPlayer.IsAlive() ? "да" : "нет") << "\n";
-    }
-
-    // --- Сценарий 5 ---
-    {
-        std::cout << "\n=== Сценарий 5: смерть от босса ===\n";
-
-        Player hero("Hero", 100, 2, Weapon::Type::eSword, "Excalibur", 25);
-        Boss   boss("Dragon", 200, 45, &hero);
-
-        PrintState(hero, boss);
-
-        std::cout << "\n-- Бой начинается --\n";
-        boss.AttackTarget();
-        PrintState(hero, boss);
-
-        std::cout << "\n-- Игрок использует зелье --\n";
-        hero.UsePotion();
-        PrintState(hero, boss);
-
-        std::cout << "\n-- Босс атакует снова --\n";
-        boss.AttackTarget();
-        PrintState(hero, boss);
-
-        std::cout << "\n-- Игрок использует последнее зелье --\n";
-        hero.UsePotion();
-        PrintState(hero, boss);
-
-        std::cout << "\n-- Босс атакует снова --\n";
-        boss.AttackTarget();
-        PrintState(hero, boss);
-
-        std::cout << "\n-- Попытка использовать зелье, когда их нет --\n";
-        hero.UsePotion();
-
-        std::cout << "\n-- Босс наносит смертельный удар --\n";
-        boss.AttackTarget();
-        PrintState(hero, boss);
-
-        std::cout << "\n-- Проверка: игрок мёртв --\n";
-        std::cout << "Игрок жив: " <<(hero.IsAlive() ? "да" : "нет") << "\n";
-
-        std::cout << "\n-- Босс пытается атаковать мёртвого игрока --\n";
-        boss.AttackTarget();
-
-        std::cout << "\n-- Конец боя --\n";
-    }
-
-    std::cout << "\n=== Конец программы ===\n";
->>>>>>> d941f764dba2971ef00876f5c442597fa0856ab9
+    std::cout << "\n=== РљРѕРЅРµС† РїСЂРѕРіСЂР°РјРјС‹ ===\n";
     return 0;
 }
