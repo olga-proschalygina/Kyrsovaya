@@ -21,7 +21,11 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
+<<<<<<< HEAD
     <ProjectGuid>{e24f4297-fbfe-4ff8-b85b-2f8b169eb05e}</ProjectGuid>
+=======
+    <ProjectGuid>{72fa6c4e-4386-4542-bb09-ead4a385daf5}</ProjectGuid>
+>>>>>>> d941f764dba2971ef00876f5c442597fa0856ab9
     <RootNamespace>gameproject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -139,6 +143,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <ClInclude Include="boss.hpp" />
     <ClInclude Include="game_world.hpp" />
     <ClInclude Include="player.hpp" />
@@ -147,12 +152,21 @@
   <ItemGroup>
     <ClCompile Include="boss.cpp" />
     <ClCompile Include="game_world.cpp" />
+=======
+    <ClCompile Include="boss.cpp" />
+>>>>>>> d941f764dba2971ef00876f5c442597fa0856ab9
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <None Include=".gitignore" />
+=======
+    <ClInclude Include="boss.hpp" />
+    <ClInclude Include="player.hpp" />
+    <ClInclude Include="weapon.hpp" />
+>>>>>>> d941f764dba2971ef00876f5c442597fa0856ab9
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
