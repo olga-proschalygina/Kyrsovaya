@@ -21,12 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-<<<<<<< HEAD
-    <ProjectGuid>{e24f4297-fbfe-4ff8-b85b-2f8b169eb05e}</ProjectGuid>
-=======
-    <ProjectGuid>{72fa6c4e-4386-4542-bb09-ead4a385daf5}</ProjectGuid>
->>>>>>> d941f764dba2971ef00876f5c442597fa0856ab9
-    <RootNamespace>gameproject</RootNamespace>
+    <ProjectGuid>{81e70fb2-5016-4219-8a28-508ee13dc41d}</ProjectGuid>
+    <RootNamespace>gameproject1</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -46,7 +42,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -143,30 +138,26 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <ClInclude Include="boss.hpp" />
-    <ClInclude Include="game_world.hpp" />
-    <ClInclude Include="player.hpp" />
-    <ClInclude Include="weapon.hpp" />
+    <None Include="..\game_project\.gitignore" />
+    <None Include="..\game_project\game_project.slnx" />
+    <None Include="..\game_project\game_project.vcxproj" />
+    <None Include="..\game_project\game_project.vcxproj.filters" />
+    <None Include="..\game_project\game_project.vcxproj.user" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="boss.cpp" />
-    <ClCompile Include="game_world.cpp" />
-=======
-    <ClCompile Include="boss.cpp" />
->>>>>>> d941f764dba2971ef00876f5c442597fa0856ab9
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="player.cpp" />
-    <ClCompile Include="weapon.cpp" />
+    <ClCompile Include="..\game_project\boss.cpp" />
+    <ClCompile Include="..\game_project\entity.cpp" />
+    <ClCompile Include="..\game_project\game_world.cpp" />
+    <ClCompile Include="..\game_project\main.cpp" />
+    <ClCompile Include="..\game_project\player.cpp" />
+    <ClCompile Include="..\game_project\weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <None Include=".gitignore" />
-=======
-    <ClInclude Include="boss.hpp" />
-    <ClInclude Include="player.hpp" />
-    <ClInclude Include="weapon.hpp" />
->>>>>>> d941f764dba2971ef00876f5c442597fa0856ab9
+    <ClInclude Include="..\game_project\boss.hpp" />
+    <ClInclude Include="..\game_project\entity.hpp" />
+    <ClInclude Include="..\game_project\game_world.hpp" />
+    <ClInclude Include="..\game_project\player.hpp" />
+    <ClInclude Include="..\game_project\weapon.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

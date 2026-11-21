@@ -10,7 +10,7 @@ namespace game {
 
         std::cout << "--- Бой начался! ---\n";
 
-        // Босс атакует игрока (передаем ссылку)
+        // Босс атакует игрока (передаем ссылку на объект)
         m_boss->AttackTarget(*m_player);
 
         // Игрок атакует босса
@@ -18,10 +18,5 @@ namespace game {
         m_boss->TakeDamage(dmg);
 
         std::cout << "--------------------\n";
-    }
-
-    void GameWorld::PrintState() const {
-        if (m_player) std::cout << "Игрок: " << m_player->GetName() << " (ОЗ: " << m_player->GetHealth() << ")\n";
-        if (m_boss) std::cout << "Босс: " << m_boss->GetName() << " (ОЗ: " << m_boss->GetHealth() << ")\n";
     }
 }
