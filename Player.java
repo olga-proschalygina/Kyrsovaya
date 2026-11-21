@@ -1,22 +1,36 @@
-public class Player {
-    private final String name;
-    private int health;
-    private final int maxHealth;
-    private int potions;
+public final class Player extends BaseEntity {
     private final Weapon weapon;
+    private int potions;
 
-    public Player(String name, int health, int potions, Weapon.Type type, String wName, int wDamage) {
-        this.name = name;
-        this.health = health > 0 ? health : 1;
-        this.maxHealth = this.health;
+    public Player(String name, int health, int potions, String wName, int wDamage) {
+        super(name, health);
         this.potions = potions > 0 ? potions : 0;
-        this.weapon = new Weapon(type, wName, wDamage);
+        this.weapon = new Weapon(wName, wDamage);
     }
+
+    public Player(Player other) {
+        super(other);
+        this.potions = other.potions;
+        this.weapon = new Weapon(other.weapon.getName(), other.weapon.attack());
+    }
+
+    @Override
     public void takeDamage(int damage) {
         if (damage <= 0) return;
         this.health = Math.max(0, this.health - damage);
         System.out.println("[Player] " + name + " получил урон " + damage + ". ОЗ: " + health);
     }
+
+    @Override
+    public BaseEntity cloneEntity() {
+        return new Player(this);
+    }
+
+    @Override
+    public String describe() {
+        return super.describe() + ", зелий: " + potions; 
+    }
+
     public boolean usePotion() {
         if (potions <= 0 || health >= maxHealth) return false;
         potions--;
@@ -24,9 +38,6 @@ public class Player {
         System.out.println("[Player] " + name + " использовал зелье. ОЗ: " + health);
         return true;
     }
+
     public int attack() { return weapon.attack(); }
-    public String getName() { return name; }
-    public int getHealth() { return health; }
-    public boolean isAlive() { return health > 0; }
-    public Weapon getWeapon() { return weapon; }
 }

@@ -11,8 +11,8 @@ public class GameWorld {
         if (player == null || boss == null) return;
         
         System.out.println("--- Бой начался! ---");
-        boss.attackTarget(player);
-        int dmg = player.attack();
+        boss.attackTarget(player); // Босс бьет игрока
+        int dmg = player.attack(); // Игрок бьет босса
         boss.takeDamage(dmg);
         System.out.println("--------------------");
     }
